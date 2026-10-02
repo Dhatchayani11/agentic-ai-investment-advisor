@@ -1,22 +1,24 @@
+from app.llm_service import get_llm
 from app.orchestration.state import InvestmentAdvisorState
+from app.prompts.investment_prompts import (
+    RESPONSE_PROMPT,
+    RESPONSE_PROMPT_VERSION,
+)
 
 
 def response_agent(state: InvestmentAdvisorState) -> InvestmentAdvisorState:
     """
-    Generates the final customer-facing response.
+    Generates the final customer-facing response using the LLM.
 
-    This is currently a deterministic implementation.
-    The LLM-based response generation will be added after
-    the complete agent workflow is validated.
+    The response is generated only after the compliance and
+    fairness agents have completed their checks.
     """
 
-    intent = state.get("intent", "UNKNOWN")
-    analysis = state.get("financial_analysis", "")
     compliance = state.get("compliance_result", "REQUIRES_REVIEW")
     fairness = state.get("fairness_result", "REQUIRES_REVIEW")
 
-    # Do not generate a customer-facing recommendation when
-    # a mandatory safety check has failed.
+    # Do not generate personalized guidance when a mandatory
+    # validation check has failed.
     if compliance != "PASSED" or fairness != "PASSED":
         state["final_response"] = (
             "This investment query requires additional review "
@@ -30,19 +32,19 @@ def response_agent(state: InvestmentAdvisorState) -> InvestmentAdvisorState:
 
         return state
 
-    state["final_response"] = (
-        "Your question relates to retirement planning and pension "
-        "contributions. Increasing a pension contribution may affect "
-        "your long-term retirement savings, but the appropriate amount "
-        "depends on your individual financial circumstances and goals. "
-        "Consider the relevant pension rules, employer contribution "
-        "arrangements, and your retirement objectives before making a change."
+    llm = get_llm()
+
+    prompt = RESPONSE_PROMPT.format(
+        query=state["query"],
+        financial_analysis=state.get("financial_analysis", ""),
+        compliance_result=compliance,
+        fairness_result=fairness,
     )
 
-    state["explanation"] = (
-        f"Intent identified as {intent}. "
-        f"The investment analysis was reviewed by the compliance "
-        f"and fairness checks before generating the response."
-    )
+    response = llm.invoke(prompt)
+
+    state["final_response"] = response.content
+
+    state["response_prompt_version"] = RESPONSE_PROMPT_VERSION
 
     return state

@@ -1,33 +1,31 @@
+from app.llm_service import get_llm
 from app.orchestration.state import InvestmentAdvisorState
+from app.prompts.investment_prompts import (
+    INVESTMENT_ANALYSIS_PROMPT,
+    PROMPT_VERSION,
+)
 
 
 def investment_agent(state: InvestmentAdvisorState) -> InvestmentAdvisorState:
     """
-    Analyzes the investment context identified by the intent agent.
+    Uses the LLM to analyze the customer's investment question.
 
-    This initial implementation establishes the agent interface.
-    Financial knowledge/RAG and LLM reasoning will be added next.
+    The prompt is maintained separately to support prompt
+    versioning and lifecycle management.
     """
 
-    intent = state.get("intent", "UNKNOWN")
+    llm = get_llm()
 
-    if intent == "RETIREMENT_PLANNING":
-        analysis = (
-            "The query relates to retirement planning and pension contributions."
-        )
-    elif intent == "STOCK_INVESTMENT":
-        analysis = (
-            "The query relates to stock or share investment."
-        )
-    elif intent == "GENERAL_INVESTMENT":
-        analysis = (
-            "The query relates to general investment guidance."
-        )
-    else:
-        analysis = (
-            "The investment intent could not be determined."
-        )
+    prompt = INVESTMENT_ANALYSIS_PROMPT.format(
+        query=state["query"],
+        intent=state.get("intent", "UNKNOWN"),
+    )
 
-    state["financial_analysis"] = analysis
+    response = llm.invoke(prompt)
+
+    state["financial_analysis"] = response.content
+
+    # Store the prompt version for traceability and evaluation.
+    state["prompt_version"] = PROMPT_VERSION
 
     return state

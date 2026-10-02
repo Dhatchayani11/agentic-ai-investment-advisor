@@ -13,6 +13,9 @@ class InvestmentAdvisorState(TypedDict, total=False):
     financial_analysis: str
     compliance_result: str
     fairness_result: str
-
+    prompt_version: str
+    response_prompt_version: str
     final_response: str
     explanation: str
+
+    

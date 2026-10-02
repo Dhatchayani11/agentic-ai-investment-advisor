@@ -6,8 +6,18 @@ class InvestmentQuery(BaseModel):
     Represents an investment-related question submitted by a customer.
     """
 
-    customer_id: str = Field(..., description="Unique customer identifier")
-    query: str = Field(..., min_length=5, description="Customer investment question")
+    customer_id: str = Field(
+        ...,
+        min_length=1,
+        description="Unique customer identifier",
+    )
+
+    query: str = Field(
+        ...,
+        min_length=5,
+        max_length=2000,
+        description="Customer investment question",
+    )
 
 
 class InvestmentResponse(BaseModel):

@@ -33,7 +33,7 @@ if __name__ == "__main__":
     result = investment_advisor_graph.invoke(
         {
             "customer_id": "customer-001",
-            "query": "Should I increase my pension contribution?"
+            "query": "Should I invest in stocks?"
         }
     )
 
