@@ -28,3 +28,4 @@ class InvestmentResponse(BaseModel):
     response: str
     explanation: str
     compliance_status: str
+    compliance_reason: str

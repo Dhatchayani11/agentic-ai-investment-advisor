@@ -1,4 +1,5 @@
 from app.llm_service import get_llm
+from app.knowledge.retriever import retrieve_knowledge
 from app.orchestration.state import InvestmentAdvisorState
 from app.prompts.investment_prompts import (
     INVESTMENT_ANALYSIS_PROMPT,
@@ -8,17 +9,19 @@ from app.prompts.investment_prompts import (
 
 def investment_agent(state: InvestmentAdvisorState) -> InvestmentAdvisorState:
     """
-    Uses the LLM to analyze the customer's investment question.
-
-    The prompt is maintained separately to support prompt
-    versioning and lifecycle management.
+    Analyzes the customer's investment question using
+    retrieved policy knowledge as grounding context.
     """
 
     llm = get_llm()
 
+    knowledge = retrieve_knowledge(state["query"])
+    state["knowledge_context"] = knowledge
+
     prompt = INVESTMENT_ANALYSIS_PROMPT.format(
         query=state["query"],
         intent=state.get("intent", "UNKNOWN"),
+        knowledge=knowledge,
     )
 
     response = llm.invoke(prompt)

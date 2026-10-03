@@ -10,8 +10,10 @@ class InvestmentAdvisorState(TypedDict, total=False):
     query: str
 
     intent: str
+    knowledge_context: str
     financial_analysis: str
     compliance_result: str
+    compliance_reason: str
     fairness_result: str
     prompt_version: str
     response_prompt_version: str

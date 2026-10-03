@@ -2,8 +2,9 @@ from fastapi import FastAPI, HTTPException
 
 from app.models import InvestmentQuery, InvestmentResponse
 from app.orchestration.graph import investment_advisor_graph
-
-
+from app.monitoring.alerts import check_alert_conditions
+import time
+from app.monitoring.logger import log_workflow_result
 app = FastAPI(
     title="Agentic AI Investment Advisor",
     description="Multi-agent AI system for personalized and compliant investment guidance",
@@ -24,11 +25,24 @@ def investment_advice(request: InvestmentQuery):
     """
 
     try:
+        start_time = time.perf_counter()
         result = investment_advisor_graph.invoke(
             {
                 "customer_id": request.customer_id,
                 "query": request.query,
             }
+        )
+        latency_ms = (time.perf_counter() - start_time) * 1000
+
+        log_workflow_result(
+            customer_id=request.customer_id,
+            query=request.query,
+            result=result,
+            latency_ms=latency_ms,
+        )
+        check_alert_conditions(
+            result=result,
+            latency_ms=latency_ms,
         )
 
         return InvestmentResponse(
@@ -43,6 +57,10 @@ def investment_advice(request: InvestmentQuery):
             compliance_status=result.get(
                 "compliance_result",
                 "REQUIRES_REVIEW",
+            ),
+            compliance_reason=result.get(
+                "compliance_reason",
+                "No compliance reason was provided.",
             ),
         )
 

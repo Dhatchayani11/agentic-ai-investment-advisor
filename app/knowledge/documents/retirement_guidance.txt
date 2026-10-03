@@ -1,0 +1,69 @@
+RETIREMENT CONTRIBUTION GUIDANCE
+
+Document type:
+General educational retirement guidance
+
+Source:
+Internal prototype knowledge base grounded with current IRS guidance.
+
+Authoritative source:
+Internal Revenue Service (IRS)
+https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits
+
+Source verification date:
+2026
+
+Purpose:
+Provide general educational information about retirement contributions.
+This document is not personalized financial advice.
+
+Key considerations:
+
+1. Retirement contribution decisions should consider the customer's
+financial circumstances, retirement goals, liquidity needs, and applicable
+account rules.
+
+2. Employer-sponsored retirement plans may have employer contribution
+or matching arrangements. Customers should review their specific plan
+documentation to understand applicable terms.
+
+3. Retirement accounts have contribution limits and tax rules that may
+change over time. Current limits must be verified against authoritative
+IRS sources before being presented as current facts.
+
+4. For 2026, the IRS states that the employee elective deferral limit
+for traditional and safe-harbor 401(k) plans is $24,500.
+
+5. For 2026, eligible participants age 50 or older may generally make
+an additional 401(k) catch-up contribution of up to $8,000, subject to
+applicable plan rules.
+
+6. For 2026, a higher catch-up contribution limit of $11,250 applies to
+participants who are age 60, 61, 62, or 63 in applicable plans, subject
+to applicable rules.
+
+7. Increasing retirement contributions can reduce current disposable
+income while potentially increasing long-term retirement savings.
+
+8. Investment values can rise or fall. Past performance does not
+guarantee future results.
+
+9. Personalized investment guidance should not be generated when
+material customer information required for the assessment is unavailable.
+
+10. Regulatory, tax, contribution-limit, and account-specific information
+must be verified against current authoritative sources before being
+presented as current facts.
+
+Compliance principle:
+
+The AI system must distinguish general educational information from
+personalized investment recommendations and must not guarantee
+investment returns or outcomes.
+
+Regulatory source principle:
+
+When a response contains current regulatory figures or limits, the
+information must be traceable to an authoritative and current source.
+If the system cannot establish adequate supporting knowledge, the
+response must be routed for additional review.
