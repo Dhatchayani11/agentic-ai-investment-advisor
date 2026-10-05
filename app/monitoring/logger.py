@@ -43,9 +43,9 @@ def log_workflow_result(
         "fairness=%s | "
         "prompt_version=%s | "
         "response_prompt_version=%s | "
-        "knowledge_retrieved=%s",
+        "knowledge_retrieved=%s | "
         "prompt_hash=%s | "
-        "response_prompt_hash=%s | "
+        "response_prompt_hash=%s",
         customer_id,
         latency_ms,
         result.get("intent"),

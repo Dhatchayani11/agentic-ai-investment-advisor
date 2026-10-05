@@ -1,96 +1,42 @@
-from app.knowledge.ingestion import ingest_documents
+from app.knowledge.vector_store import KnowledgeVectorStore
 
 
-STOP_WORDS = {
-    "the",
-    "should",
-    "i",
-    "my",
-    "a",
-    "an",
-    "is",
-    "are",
-    "to",
-    "in",
-    "of",
-    "for",
-    "and",
-    "or",
-    "can",
-    "could",
-    "would",
-    "what",
-    "how",
-}
+_vector_store = KnowledgeVectorStore()
+SIMILARITY_THRESHOLD = 0.50
 
-
-def retrieve_knowledge(query: str) -> str:
+def retrieve_knowledge(
+    query: str,
+    top_k: int = 3,
+) -> str:
     """
-    Retrieves relevant knowledge sections from ingested documents.
+    Retrieves semantically relevant knowledge for the customer query.
 
-    The prototype uses keyword overlap with stop-word filtering.
-    Semantic/vector retrieval can replace this implementation later
-    without changing the ingestion interface.
+    The retrieved source metadata is preserved so downstream agents
+    can trace the knowledge used to ground the response.
     """
 
-    query_terms = {
-        term.strip(".,?!").lower()
-        for term in query.split()
-        if len(term.strip(".,?!")) > 2
-        and term.strip(".,?!").lower() not in STOP_WORDS
-    }
+    results = _vector_store.search(
+        query=query,
+        top_k=top_k,
+    )
+    results = [
+        result
+        for result in results
+        if result["similarity_score"] >= SIMILARITY_THRESHOLD
+    ]
 
-    relevant_sections = []
-
-    documents = ingest_documents()
-
-    for document in documents:
-        content = document["content"]
-
-        sections = content.split("\n\n")
-
-        for section in sections:
-            section_clean = section.strip()
-
-            if not section_clean:
-                continue
-
-            section_terms = {
-                term.strip(".,?!:").lower()
-                for term in section_clean.split()
-                if len(term.strip(".,?!:")) > 2
-            }
-
-            matched_terms = query_terms.intersection(section_terms)
-
-            if not matched_terms:
-                continue
-
-            relevant_sections.append(
-                {
-                    "document_name": document["document_name"],
-                    "document_type": document["document_type"],
-                    "section": section_clean,
-                    "score": len(matched_terms),
-                }
-            )
-
-    if not relevant_sections:
+    if not results:
         return "No relevant policy knowledge was found."
 
-    # Return the most relevant sections first.
-    relevant_sections.sort(
-        key=lambda item: item["score"],
-        reverse=True,
-    )
+    formatted_results = []
 
-    formatted_sections = []
-
-    for item in relevant_sections[:5]:
-        formatted_sections.append(
-            f"Source document: {item['document_name']}\n"
-            f"Document type: {item['document_type']}\n"
-            f"{item['section']}"
+    for result in results:
+        formatted_results.append(
+            f"Source document: {result['document_name']}\n"
+            f"Document type: {result['document_type']}\n"
+            f"Similarity score: "
+            f"{result['similarity_score']:.4f}\n"
+            f"{result['content']}"
         )
 
-    return "\n\n".join(formatted_sections)
+    return "\n\n".join(formatted_results)

@@ -5,3 +5,5 @@ python-dotenv
 langgraph
 langchain
 langchain-groq
+sentence-transformers
+faiss-cpu
