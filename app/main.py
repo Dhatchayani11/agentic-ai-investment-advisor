@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException
 
-from app.models import InvestmentQuery, InvestmentResponse
+from app.models import (InvestmentQuery, InvestmentResponse, FeedbackRequest, FeedbackResponse,)
 from app.orchestration.graph import investment_advisor_graph
 from app.monitoring.alerts import check_alert_conditions
 import time
+from app.monitoring.feedback import record_feedback
+from uuid import uuid4
 from app.monitoring.logger import log_workflow_result
 app = FastAPI(
     title="Agentic AI Investment Advisor",
@@ -26,10 +28,12 @@ def investment_advice(request: InvestmentQuery):
 
     try:
         start_time = time.perf_counter()
+        advice_id = str(uuid4())
         result = investment_advisor_graph.invoke(
             {
                 "customer_id": request.customer_id,
                 "query": request.query,
+                "advice_id": advice_id,
             }
         )
         latency_ms = (time.perf_counter() - start_time) * 1000
@@ -45,7 +49,7 @@ def investment_advice(request: InvestmentQuery):
             latency_ms=latency_ms,
         )
 
-        return InvestmentResponse(
+        return InvestmentResponse(advice_id=advice_id,
             response=result.get(
                 "final_response",
                 "The query could not be processed at this time.",
@@ -69,4 +73,46 @@ def investment_advice(request: InvestmentQuery):
         raise HTTPException(
             status_code=500,
             detail="Unable to process the investment query.",
+        ) from exc
+
+@app.post(
+    "/investment/feedback",
+    response_model=FeedbackResponse,
+)
+def investment_feedback(
+    request: FeedbackRequest,
+):
+    """
+    Records customer or reviewer feedback for a generated
+    investment advisory response.
+
+    Feedback forms part of the continuous improvement loop
+    for evaluation, prompt refinement, and knowledge improvement.
+    """
+
+    try:
+        feedback_id = record_feedback(
+            advice_id=request.advice_id,
+            customer_id=request.customer_id,
+            rating=request.rating,
+            comment=request.comment,
+        )
+
+        return FeedbackResponse(
+            feedback_id=feedback_id,
+            status="recorded",
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except Exception as exc:
+        print(f"Feedback recording error: {exc}")
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to record feedback.",
         ) from exc
