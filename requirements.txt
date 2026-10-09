@@ -7,3 +7,5 @@ langchain
 langchain-groq
 sentence-transformers
 faiss-cpu
+streamlit
+requests

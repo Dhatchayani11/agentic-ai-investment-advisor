@@ -1,4 +1,6 @@
 import logging
+
+from sympy import python
 from app.prompts.investment_prompts import (
     INVESTMENT_PROMPT_DEFINITION,
     RESPONSE_PROMPT_DEFINITION,
@@ -35,7 +37,6 @@ def log_workflow_result(
 
     logger.info(
         "workflow_completed | "
-        "customer_id=%s | "
         "latency_ms=%.2f | "
         "intent=%s | "
         "compliance=%s | "
@@ -46,7 +47,6 @@ def log_workflow_result(
         "knowledge_retrieved=%s | "
         "prompt_hash=%s | "
         "response_prompt_hash=%s",
-        customer_id,
         latency_ms,
         result.get("intent"),
         result.get("compliance_result"),

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -31,6 +33,7 @@ class InvestmentResponse(BaseModel):
     compliance_status: str
     compliance_reason: str
 
+
 class FeedbackRequest(BaseModel):
     """
     Represents customer or reviewer feedback for a generated
@@ -49,7 +52,7 @@ class FeedbackRequest(BaseModel):
         description="Unique customer identifier",
     )
 
-    rating: str = Field(
+    rating: Literal["positive", "negative"] = Field(
         ...,
         description="Feedback rating: positive or negative",
     )
